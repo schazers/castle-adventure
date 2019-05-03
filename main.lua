@@ -67,6 +67,24 @@ T.F,FFTT.,..
 TF,F.TFFFFTT
 FTT.T,T.TFTF
 ]],
+},
+{
+worldPosX = 1,
+worldPosY = 0,
+mapData = [[
+..TTFT.FT.H.
+TFF...TFF...
+...,..,.FTFT
+...,..,.TT,F
+555555555555
+676666666676
+666676666666
+444444444444
+,..,.F.,,.FF
+..,.,T..F,T,
+T.F,FFTT.TFT
+TF,F.TFFFFTT
+]],
 }
 }
 
@@ -183,11 +201,19 @@ function love.keypressed(key)
   -- Figure out if the player can move into that tile
   local canMoveIntoTile = true
   if col < 1 then
-    currMapIdx = 2
+    if currMapIdx == 1 then 
+      currMapIdx = 2
+    elseif currMapIdx == 3 then
+      currMapIdx = 1
+    end
     col = LEVEL_COLUMNS
     updateMapData()
   elseif col > LEVEL_COLUMNS then
-    currMapIdx = 1
+    if currMapIdx == 2 then 
+      currMapIdx = 1
+    elseif currMapIdx == 1 then
+      currMapIdx = 3
+    end
     col = 1
     updateMapData()
   elseif row < 1 or row > LEVEL_ROWS then
