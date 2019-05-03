@@ -207,8 +207,7 @@ function love.keypressed(key)
         network.async(function()
           -- Refer by URL here, other game uses `gameId`
           castle.game.load(
-            --'https://raw.githubusercontent.com/schazers/ghost-racer/master/main.lua',
-            'file:///Users/admin/Desktop/Expo/ghost-racer/ghost-racer.castle',
+            'https://raw.githubusercontent.com/schazers/ghost-racer/master/main.lua',
             {
               msg = 'Message received from castle-adventure',
             }
