@@ -1,7 +1,7 @@
 ---
 main: main.lua
-name: lil adventure
-username: bridgs
+name: castle adventure
+username: schazers
 primaryColor: 23AF4D
 coverImage: cover-image.png
-description: A lil adventure where you walkabout a tile grid.
+description: A medium adventure where you xplore games.
