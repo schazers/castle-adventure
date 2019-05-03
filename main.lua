@@ -123,9 +123,6 @@ function love.load()
   -- and make a key appear on the ground for them to pick up. add a simple 
   -- inventory to the adventure character?
   if referrer ~= nil then
-    for k,v in pairs(referrer) do
-      print("k: "..k..", v: "..v)
-    end
     print("referrerTitle: "..referrerTitle)
     print("message received: "..msgFromReferrer)
   end
