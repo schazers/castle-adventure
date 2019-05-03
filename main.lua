@@ -275,7 +275,7 @@ function love.keypressed(key)
             }
           )
         end)
-      elseif tileGrid[col][row].sprite == 'key' and not hasKey then
+      elseif tileGrid[col][row].sprite == 'key' and shouldShowKey and not hasKey then
         hasKey = true
         shouldShowKey = false
         love.audio.play(keySound:clone())
