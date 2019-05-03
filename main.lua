@@ -19,7 +19,7 @@ local TILE_TYPES = {
   ['M'] = { sprite = 7, isImpassable = true },
   -- House
   ['H'] = { sprite = 8, isPortal = true, url = 'https://raw.githubusercontent.com/schazers/ghost-racer/master/main.lua' },
-  ['W'] = { sprite = 8, isPortal = true, url = 'https://raw.githubusercontent.com/nikki93/wat-do/master/main.lua' },
+  ['W'] = { sprite = 8, isPortal = true, url = 'https://raw.githubusercontent.com/schazers/wat-dont/master/main.lua' },
   -- Path
   ['~'] = { sprite = 9 },
   -- Lake
