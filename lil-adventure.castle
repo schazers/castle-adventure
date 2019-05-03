@@ -1,0 +1,7 @@
+---
+main: main.lua
+name: lil adventure
+username: bridgs
+primaryColor: 23AF4D
+coverImage: cover-image.png
+description: A lil adventure where you walkabout a tile grid.
