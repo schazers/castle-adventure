@@ -61,14 +61,14 @@ worldPosY = 0,
 mapData = [[
 ..TTFT.FT.,T
 TFF...TFFTTF
-.T.,.T.,....
-F,....,,....
+.T.,.T.,...T
+F,....,,...T
 F....K,.....
 TTF.,H...~~~
 FT.,..,.....
-T..,..,,....
-FT,T,....,.,
-T.F,FFTT.,..
+T..,..,,...F
+FT,T,....,TF
+T.F,FFTT.F.T
 TF,F.TFFFFTT
 FTT.T,T.TFTF
 ]],
