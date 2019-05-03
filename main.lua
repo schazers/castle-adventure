@@ -18,7 +18,8 @@ local TILE_TYPES = {
   ['L'] = { sprite = 6, isImpassable = true },
   ['M'] = { sprite = 7, isImpassable = true },
   -- House
-  ['H'] = { sprite = 8, isPortal = true },
+  ['H'] = { sprite = 8, isPortal = true, url = 'https://raw.githubusercontent.com/schazers/ghost-racer/master/main.lua' },
+  ['W'] = { sprite = 8, isPortal = true, url = 'https://raw.githubusercontent.com/nikki93/wat-do/master/main.lua' },
   -- Path
   ['~'] = { sprite = 9 },
   -- Lake
@@ -28,7 +29,11 @@ local TILE_TYPES = {
   ['4'] = { sprite = 13, isImpassable = true },
   ['5'] = { sprite = 14, isImpassable = true },
   ['6'] = { sprite = 15, isImpassable = true },
-  ['7'] = { sprite = 16, isImpassable = true }
+  ['7'] = { sprite = 16, isImpassable = true },
+  -- Key
+  ['K'] = { sprite = 'key' },
+  -- Gate
+  ['G'] = { sprite = 'gate', isImpassable = true }
 }
 
 local LEVEL_DATA = {
@@ -58,7 +63,7 @@ mapData = [[
 TFF...TFFTTF
 .T.,.T.,....
 F,....,,....
-F.....,.....
+F....K,.....
 TTF.,H...~~~
 FT.,..,.....
 T..,..,,....
@@ -72,10 +77,10 @@ FTT.T,T.TFTF
 worldPosX = 1,
 worldPosY = 0,
 mapData = [[
-..TTFT.FT.H.
-TFF...TFF...
-...,..,.FTFT
-...,..,.TT,F
+..TTFT.FT.W.
+TFF...T.F...
+...,..,.FGFT
+...,..,.,.,F
 555555555555
 676666666676
 666676666666
@@ -93,12 +98,19 @@ local player
 local tileGrid
 local currMapIdx = 1
 local kartPortal = nil
+local hasKey = false
+local shouldShowKey = false
+local gateLocked = true
 
 -- Assets
 local playerImage
 local tilesImage
+local keyImage
+local gateImage
 local moveSound
 local bumpSound
+local keySound
+local gateSound
 
 -- Get referring game data
 local referrer = castle.game.getReferrer()
@@ -111,21 +123,16 @@ function love.load()
   -- Load assets
   playerImage = love.graphics.newImage('img/player.png')
   tilesImage = love.graphics.newImage('img/tiles.png')
+  keyImage = love.graphics.newImage('img/key.png')
+  gateImage = love.graphics.newImage('img/gate.png')
   playerImage:setFilter('nearest', 'nearest')
   tilesImage:setFilter('nearest', 'nearest')
+  keyImage:setFilter('nearest', 'nearest')
+  gateImage:setFilter('nearest', 'nearest')
   moveSound = love.audio.newSource('sfx/move.wav', 'static')
   bumpSound = love.audio.newSource('sfx/bump.wav', 'static')
-
-  -- Create the level
-  updateMapData()
-
-  -- TODO(jason): init player where they should be based upon that game
-  -- and make a key appear on the ground for them to pick up. add a simple 
-  -- inventory to the adventure character?
-  if referrer ~= nil then
-    print("referrerTitle: "..referrerTitle)
-    print("message received: "..msgFromReferrer)
-  end
+  keySound = love.audio.newSource('sfx/key.mp3', 'static')
+  gateSound = love.audio.newSource('sfx/gate.mp3', 'static')
 
   -- Create the player
   player = {
@@ -133,6 +140,21 @@ function love.load()
     row = 6,
     facing = 'down'
   }
+
+  -- TODO(jason): init player where they should be based upon that game
+  -- and make a key appear on the ground for them to pick up. add a simple 
+  -- inventory to the adventure character?
+  if referrer ~= nil then
+    print("referrerTitle: "..referrerTitle)
+    print("message received: "..msgFromReferrer)
+    currMapIdx = 2
+    player.col = 7
+    player.row = 6
+    shouldShowKey = true
+  end
+
+  -- Create the level
+  updateMapData()
 end
 
 -- Update map data
@@ -159,7 +181,19 @@ function love.draw()
   for col = 1, LEVEL_COLUMNS do
     for row = 1, LEVEL_ROWS do
       if tileGrid[col][row] then
-        drawSprite(tilesImage, 16, 16, tileGrid[col][row].sprite, calculateRenderPosition(col, row))
+        if tileGrid[col][row].sprite == 'gate' then
+          drawSprite(tilesImage, 16, 16, 1, calculateRenderPosition(col, row))
+          if gateLocked then
+            drawSprite(gateImage, 16, 16, 1, calculateRenderPosition(col, row))
+          end
+        elseif tileGrid[col][row].sprite == 'key' then
+          drawSprite(tilesImage, 16, 16, 1, calculateRenderPosition(col, row))
+          if shouldShowKey and not hasKey then
+            drawSprite(keyImage, 16, 16, 1, calculateRenderPosition(col, row))
+          end
+        else
+          drawSprite(tilesImage, 16, 16, tileGrid[col][row].sprite, calculateRenderPosition(col, row))
+        end
       end
     end
   end
@@ -175,6 +209,9 @@ function love.draw()
   end
   local x, y = calculateRenderPosition(player.col, player.row)
   drawSprite(playerImage, 16, 16, sprite, x, y, player.facing == 'left')
+  if hasKey then
+    drawSprite(keyImage, 16, 16, 1, x, y)
+  end
 end
 
 -- Press arrow keys to move the player
@@ -217,6 +254,9 @@ function love.keypressed(key)
     canMoveIntoTile = false
   else
     local tile = tileGrid[col][row]
+    if tile.sprite == 'gate' and hasKey then
+      tile.isImpassable = false
+    end
     if tile and tile.isImpassable then
       canMoveIntoTile = false
     end
@@ -230,12 +270,19 @@ function love.keypressed(key)
         network.async(function()
           -- Refer by URL here, other game uses `gameId`
           castle.game.load(
-            'https://raw.githubusercontent.com/schazers/ghost-racer/master/main.lua',
-            {
+            tileGrid[col][row].url, {
               msg = 'Message received from castle-adventure',
             }
           )
         end)
+      elseif tileGrid[col][row].sprite == 'key' and not hasKey then
+        hasKey = true
+        shouldShowKey = false
+        love.audio.play(keySound:clone())
+      elseif tileGrid[col][row].sprite == 'gate' and hasKey then
+        gateLocked = false
+        hasKey = false
+        love.audio.play(gateSound:clone())
       else
         love.audio.play(moveSound:clone())
       end
