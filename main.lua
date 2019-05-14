@@ -1,8 +1,3 @@
--- Render constants
-local GAME_WIDTH = 192
-local GAME_HEIGHT = 192
-local RENDER_SCALE = 3
-
 -- Game constants
 local LEVEL_COLUMNS = 12
 local LEVEL_ROWS = 12
@@ -174,8 +169,7 @@ end
 function love.draw()
 
   -- Scale and crop the screen
-  love.graphics.setScissor(0, 0, RENDER_SCALE * GAME_WIDTH, RENDER_SCALE * GAME_HEIGHT)
-  love.graphics.scale(RENDER_SCALE, RENDER_SCALE)
+  --love.graphics.setScissor(0, 0, this.graphics.getWidth(), this.graphics.getHeight())
 
   -- Draw the tiles
   for col = 1, LEVEL_COLUMNS do
