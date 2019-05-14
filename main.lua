@@ -167,10 +167,6 @@ end
 
 -- Render the game
 function love.draw()
-
-  -- Scale and crop the screen
-  --love.graphics.setScissor(0, 0, this.graphics.getWidth(), this.graphics.getHeight())
-
   -- Draw the tiles
   for col = 1, LEVEL_COLUMNS do
     for row = 1, LEVEL_ROWS do
